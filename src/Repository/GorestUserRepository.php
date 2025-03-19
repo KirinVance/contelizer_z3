@@ -32,7 +32,6 @@ class GorestUserRepository extends ServiceEntityRepository
     public function findByNameOrEmail(?string $name, ?string $email, int $limit = 10): array
     {
         $qb = $this->createQueryBuilder('u');
-        file_put_contents('aaa.log', $name.$email);
 
         if ($name) {
             $qb->andWhere('u.name LIKE :name')
