@@ -1,0 +1,26 @@
+<div id="form-overlay" class="overlay">
+
+    <div id="form-wrapper" class="form-wrapper">
+        <div class="form-container">
+            <button id="close-form" class="close-btn">&times;</button>
+            {{ form_start(form, {'attr': {'class': 'delete-form'}}) }}
+
+                {{ form_widget(form.id) }}
+                {{ form_widget(form.gorest_id) }}
+                {{ form_widget(form._token) }}
+
+                <h2>Confirm Deletion</h2>
+
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Name:</strong> {{ form.vars.value.name }}</li>
+                    <li class="list-group-item"><strong>Email:</strong> {{ form.vars.value.email }}</li>
+                    <li class="list-group-item"><strong>Gender:</strong> {{ form.vars.value.gender }}</li>
+                    <li class="list-group-item"><strong>Status:</strong> {{ form.vars.value.status }}</li>
+                </ul>
+
+                <button type="submit" id="submit-form" class="btn btn-danger mt-3">Delete</button>
+
+            {{ form_end(form, {'render_rest': false}) }}
+        </div>
+    </div>
+</div>

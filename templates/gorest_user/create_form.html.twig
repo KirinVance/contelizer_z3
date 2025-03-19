@@ -1,0 +1,41 @@
+<div id="form-overlay" class="overlay">
+
+    <div id="form-wrapper" class="form-wrapper">
+        <div class="form-container">
+            <button id="close-form" class="close-btn">&times;</button>
+            {{ form_start(form, {'attr': {'class': 'create-form'}}) }}
+
+                {{ form_widget(form.id) }}
+                {{ form_widget(form.gorest_id) }}
+                {{ form_widget(form._token) }}
+
+                <div class="mb-3">
+                    <label>{{ form_label(form.name) }}</label>
+                    {{ form_widget(form.name) }}
+                    {{ form_errors(form.name) }}
+                </div>
+
+                <div class="mb-3">
+                    <label>{{ form_label(form.email) }}</label>
+                    {{ form_widget(form.email) }}
+                    {{ form_errors(form.email) }}
+                </div>
+
+                <div class="mb-3 radio-select">
+                    <label class="form-label">{{ form_label(form.gender) }}</label>
+                    {{ form_widget(form.gender) }}
+                    {{ form_errors(form.gender) }}
+                </div>
+
+                <div class="mb-3">
+                    <label>{{ form_label(form.status) }}</label>
+                    {{ form_widget(form.status) }}
+                    {{ form_errors(form.status) }}
+                </div>
+
+                <button type="submit" id="submit-form" class="btn btn-primary mt-3">Create</button>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>

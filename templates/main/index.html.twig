@@ -3,12 +3,53 @@
 {% block title %}Hello MainController!{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div id="app-container" data-mode="local" data-local-url="{{ local_url }}" data-api-url="{{ api_url }}" class="container mt-5">
+    <h2 class="text-center">Current Mode:&nbsp<span id="mode-span" class="text-success">LOCAL</span></h2>
 
-<div class="example-wrapper">
-    <h1> Zadanko 3 here xD </h1>
+    <div class="text-center my-3">
+        <button id="btn-local" class="btn btn-outline-primary mode-btn d-none">Switch to LOCAL Mode</button>
+        <button id="btn-api" class="btn btn-outline-primary mode-btn">Switch  to API Mode</button>
+    </div>
+
+    <div class="text-center my-3" style="height:50px;">
+        <button id="btn-reload" class="btn btn-success mx-1">RELOAD</button>
+        <button id="btn-find" class="btn btn-success mx-1">FIND</button>
+        <button id="btn-create" class="btn btn-success mx-1">CREATE</button>
+        <button id="btn-sync" class="btn btn-success mx-1">SYNC LOCAL WITH API</button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th>id</th>
+                    <th>gorestId</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Gender</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="data-table">
+            <!-- EXAMPLE OF USER HTML
+                <tr>
+                    <td>1</td>
+                    <td>745645</td>
+                    <td>John Doe</td>
+                    <td>john@example.com</td>
+                    <td>Male</td>
+                    <td>Active</td>
+                    <td>
+                        <button data-id="1" data-gorest-id="1" class="edit-user btn btn-success btn-sm mx-1">✏️</button>
+                        <button data-id="1" data-gorest-id="1" class="delete-user btn btn-warning btn-sm mx-1">❌</button>
+                    </td>
+                </tr>
+            -->
+            </tbody>
+        </table>
+    </div>
+    <div id="flash-message" class="alert d-none"></div>
+    <div id="loading" class="overlay d-none"></div>
 </div>
 {% endblock %}

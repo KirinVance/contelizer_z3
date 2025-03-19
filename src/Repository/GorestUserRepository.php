@@ -21,28 +21,32 @@ class GorestUserRepository extends ServiceEntityRepository
         parent::__construct($registry, GorestUser::class);
     }
 
-//    /**
-//     * @return GorestUser[] Returns an array of GorestUser objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('g')
-//            ->andWhere('g.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('g.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * Find users by name, email, or both
+     *
+     * @param string|null $name
+     * @param string|null $email
+     * @param int $limit
+     * @return GorestUser[]
+     */
+    public function findByNameOrEmail(?string $name, ?string $email, int $limit = 10): array
+    {
+        $qb = $this->createQueryBuilder('u');
+        file_put_contents('aaa.log', $name.$email);
 
-//    public function findOneBySomeField($value): ?GorestUser
-//    {
-//        return $this->createQueryBuilder('g')
-//            ->andWhere('g.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        if ($name) {
+            $qb->andWhere('u.name LIKE :name')
+               ->setParameter('name', "%{$name}%");
+        }
+
+        if ($email) {
+            $qb->andWhere('u.email LIKE :email')
+               ->setParameter('email', "%{$email}%");
+        }
+
+        return $qb->setMaxResults($limit)
+                  ->orderBy('u.id', 'DESC')
+                  ->getQuery()
+                  ->getResult();
+    }
 }

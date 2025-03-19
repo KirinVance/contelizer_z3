@@ -1,0 +1,27 @@
+<div id="form-overlay" class="overlay">
+
+    <div id="form-wrapper" class="form-wrapper">
+        <div class="form-container">
+            <button id="close-form" class="close-btn">&times;</button>
+            {{ form_start(form, {'attr': {'class': 'find-form'}}) }}
+
+                {{ form_widget(form._token) }}
+
+                <div class="mb-3">
+                    <label>{{ form_label(form.name) }}</label>
+                    {{ form_widget(form.name) }}
+                    {{ form_errors(form.name) }}
+                </div>
+
+                <div class="mb-3">
+                    <label>{{ form_label(form.email) }}</label>
+                    {{ form_widget(form.email) }}
+                    {{ form_errors(form.email) }}
+                </div>
+
+                <button type="submit" id="submit-form" class="btn btn-primary mt-3">Find</button>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
