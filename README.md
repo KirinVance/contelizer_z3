@@ -7,13 +7,13 @@ Tryb API używa GorestApiController, którego źródłem danych jest serwis Gore
 Do tego mamy przycisk "Sync Local With Api", który czyści wpisy lokalne i wstawia do lokalnej bazy 10 wpisów z Goresta.
 
 ## 📌 Setup
-ustawić dane bazy w .env
-composer install
-symfony serve
-npm run dev
-php bin/console doctrine:database:create
-php bin/console doctrine:migrations:migrate
-i zapraszam na http://localhost:8000
+- ustawić dane bazy w .env
+- composer install
+- symfony serve
+- npm run dev
+- php bin/console doctrine:database:create
+- php bin/console doctrine:migrations:migrate
+- i zapraszam na http://localhost:8000
 
 ## 📌 Elementy projektu
 - Użycie standardowych elementów Symfony takich jak Entity, Repository, Controller, FormType, Template, Service
