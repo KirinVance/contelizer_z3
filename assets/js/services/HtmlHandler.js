@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import { GorestBackend } from './GorestBackend.js';
-import { GorestResponseHandler } from './GorestResponseHandler.js';
 import { GorestToolkit } from './GorestToolkit.js';
 
 export class HtmlHandler {
@@ -14,6 +13,8 @@ export class HtmlHandler {
         $("tbody").html(tableHtml);
 
         HtmlHandler.mountUsersButtons();
+
+        $("#loading").addClass("d-none");
     }
 
     static generateUserHtml(user) {
@@ -80,7 +81,6 @@ export class HtmlHandler {
             $("#loading").removeClass("d-none");
 
             const findData = GorestToolkit.getFindDataFromForm($(".find-form"));
-            console.log(findData);
 
             GorestBackend.find(findData, (response) => {
                 HtmlHandler.handleFindFormResponse(response);
@@ -173,6 +173,7 @@ export class HtmlHandler {
     }
 
     static reload() {
+        $("#loading").removeClass("d-none");
         GorestBackend.index((response) => {
             if (!response.success) {
                 return HtmlHandler.flash(response.message);

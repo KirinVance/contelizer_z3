@@ -3,6 +3,41 @@ gorest_create_form:
     controller: App\Controller\GorestLocalController::getCreateForm
     methods: POST
 
+gorest_api_update_form:
+    path: /gorest/api/update-form
+    controller: App\Controller\GorestApiController::getUpdateForm
+    methods: POST
+
+gorest_api_delete_form:
+    path: /gorest/api/delete-form
+    controller: App\Controller\GorestApiController::getDeleteForm
+    methods: POST
+
+gorest_api_create:
+    path: /gorest/api/create
+    controller: App\Controller\GorestApiController::create
+    methods: POST
+
+gorest_api_delete:
+    path: /gorest/api/delete
+    controller: App\Controller\GorestApiController::delete
+    methods: POST
+
+gorest_api_update:
+    path: /gorest/api/update
+    controller: App\Controller\GorestApiController::update
+    methods: POST
+
+gorest_api_find:
+    path: /gorest/api/find
+    controller: App\Controller\GorestApiController::find
+    methods: POST
+
+gorest_api_index:
+    path: /gorest/api/
+    controller: App\Controller\GorestApiController::index
+    methods: POST
+
 gorest_local_update_form:
     path: /gorest/local/update-form
     controller: App\Controller\GorestLocalController::getUpdateForm
@@ -13,8 +48,8 @@ gorest_local_delete_form:
     controller: App\Controller\GorestLocalController::getDeleteForm
     methods: POST
 
-gorest_local_find_form:
-    path: /gorest/local/find-form
+gorest_find_form:
+    path: /gorest/find-form
     controller: App\Controller\GorestLocalController::getFindForm
     methods: POST
 
@@ -40,7 +75,7 @@ gorest_local_find:
 
 gorest_sync:
     path: /gorest/sync
-    controller: App\Controller\GorestLocalController::sync
+    controller: App\Controller\GorestApiController::syncLocalWithApi
     methods: POST
 
 gorest_local_index:

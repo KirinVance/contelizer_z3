@@ -49,8 +49,7 @@ export class GorestBackend {
     }
 
     static getFindForm(responseFunction) {
-        const mode = $("#app-container").attr("data-mode");
-        return this.fetch(`${mode}/find-form`, {}, responseFunction);
+        return this.fetch(`find-form`, {}, responseFunction);
     }
 
     static getCreateForm(responseFunction) {

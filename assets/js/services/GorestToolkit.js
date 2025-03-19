@@ -17,6 +17,8 @@ export class GorestToolkit {
             }
         });
 
+        user.gorestId = user.gorest_id;
+
         return user;
     }
 

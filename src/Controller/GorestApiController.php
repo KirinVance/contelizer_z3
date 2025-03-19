@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use Twig\Environment;
 use App\Entity\GorestUser;
+use App\Service\GorestApi;
 use App\Form\GorestUserType;
-use App\Form\FindGorestUserType;
 use App\Repository\GorestUserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,22 +15,21 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class GorestLocalController extends AbstractController
+class GorestApiController extends AbstractController
 {
-    private const PAGE_SIZE = 10;
+    public const PAGE_SIZE = 10;
 
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private GorestUserRepository $repository
+        private GorestUserRepository $repository,
+        private GorestApi $api,
     ) {
-        $this->entityManager = $entityManager;
-        $this->repository = $repository;
     }
 
-    #[Route('/gorest/local/', name: 'gorest.local.index')]
+    #[Route('/gorest/api/', name: 'gorest.api.index')]
     public function index(): JsonResponse
     {
-        $users = $this->repository->findBy([], null, self::PAGE_SIZE);
+        $users = $this->api->index(self::PAGE_SIZE);
 
         return $this->json([
             'success' => true,
@@ -38,7 +37,7 @@ class GorestLocalController extends AbstractController
         ]);
     }
 
-    #[Route('/gorest/local/find', name: 'gorest.local.find')]
+    #[Route('/gorest/api/find', name: 'gorest.api.find')]
     public function find(Request $request): JsonResponse
     {
         $data = (array)json_decode($request->getContent(), true);
@@ -53,7 +52,7 @@ class GorestLocalController extends AbstractController
             ], 422);
         }
 
-        $users = $this->repository->findByNameOrEmail($name, $email, self::PAGE_SIZE);
+        $users = $this->api->findByNameOrEmail($name, $email);
         $count = count($users);
         $plural = ($count === 1) ? '' : 's';
 
@@ -64,7 +63,7 @@ class GorestLocalController extends AbstractController
         ], 201);
     }
 
-    #[Route('/gorest/local/create', name: 'gorest.local.create')]
+    #[Route('/gorest/api/create', name: 'gorest.api.create')]
     public function create(Request $request, CsrfTokenManagerInterface $csrfTokenManager): JsonResponse
     {
         $data = (array)json_decode($request->getContent(), true);
@@ -84,23 +83,15 @@ class GorestLocalController extends AbstractController
             ], 422);
         }
 
-        $user = new GorestUser();
-        $user->setName($data['name']);
-        $user->setEmail($data['email']);
-        $user->setGender($data['gender']);
-        $user->setStatus($data['status']);
-
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        $result = $this->api->create($data);
 
         return $this->json([
-            'success' => true,
-            'message' => 'User created successfully',
-            'user' => $user
+            'success' => $result,
+            'message' => ($result) ? 'User created successfully' : 'Create user error',
         ], 201);
     }
 
-    #[Route('/gorest/local/update', name: 'gorest.local.update')]
+    #[Route('/gorest/api/update', name: 'gorest.api.update')]
     public function update(Request $request, CsrfTokenManagerInterface $csrfTokenManager): JsonResponse
     {
         $data = (array)json_decode($request->getContent(), true);
@@ -113,37 +104,22 @@ class GorestLocalController extends AbstractController
             ], 403);
         }
 
-        if (!isset($data['id']) || !$this->isUserDataValid($data)) {
+        if (!isset($data['gorestId']) || !$this->isUserDataValid($data)) {
             return $this->json([
                 'success' => false,
                 'message' => 'Invalid data',
             ], 422);
         }
 
-        $user = $this->repository->find((int)$data['id']);
-        if (!$user) {
-            return $this->json([
-                'success' => false,
-                'message' => 'User does not exist',
-            ], 404);
-        }
-
-        $user->setName($data['name']);
-        $user->setEmail($data['email']);
-        $user->setGender($data['gender']);
-        $user->setStatus($data['status']);
-
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        $result = $this->api->update((int)$data['gorestId'], $data);
 
         return $this->json([
-            'success' => true,
-            'message' => 'User updated successfully',
-            'user' => $user
+            'success' => $result,
+            'message' => ($result) ? 'User updated successfully': 'Update user error',
         ], 201);
     }
 
-    #[Route('/gorest/local/delete', name: 'gorest.local.delete')]
+    #[Route('/gorest/api/delete', name: 'gorest.api.delete')]
     public function delete(Request $request, CsrfTokenManagerInterface $csrfTokenManager): JsonResponse
     {
         $data = (array)json_decode($request->getContent(), true);
@@ -156,27 +132,18 @@ class GorestLocalController extends AbstractController
             ], 403);
         }
 
-        if (!isset($data['id'])) {
+        if (!isset($data['gorestId'])) {
             return $this->json([
                 'success' => false,
                 'message' => 'Invalid data',
             ], 422);
         }
 
-        $user = $this->repository->find((int)$data['id']);
-        if (!$user) {
-            return $this->json([
-                'success' => false,
-                'message' => 'User does not exist',
-            ], 404);
-        }
-
-        $this->entityManager->remove($user);
-        $this->entityManager->flush();
+        $result = $this->api->delete((int)$data['gorestId']);
 
         return $this->json([
-            'success' => true,
-            'message' => 'User deleted successfully',
+            'success' => $result,
+            'message' => ($result) ? 'User deleted successfully' : 'Delete user error',
         ], 201);
     }
 
@@ -201,54 +168,31 @@ class GorestLocalController extends AbstractController
         return true;
     }
 
-    public function getFindForm(Environment $twig): JsonResponse
-    {
-        $user = new GorestUser();
-        $form = $this->createForm(FindGorestUserType::class, $user);
-
-        $html = $twig->render('gorest_user/find_form.html.twig', [
-            'form' => $form->createView(),
-        ]);
-
-        return new JsonResponse([
-            'success' => true,
-            'form' => $html
-        ]);
-    }
-
-    public function getCreateForm(Environment $twig): JsonResponse
-    {
-        $user = new GorestUser();
-        $form = $this->createForm(GorestUserType::class, $user);
-
-        $html = $twig->render('gorest_user/create_form.html.twig', [
-            'form' => $form->createView(),
-        ]);
-
-        return new JsonResponse([
-            'success' => true,
-            'form' => $html
-        ]);
-    }
-
     public function getUpdateForm(Request $request, Environment $twig): JsonResponse
     {
         $data = (array)json_decode($request->getContent(), true);
 
-        if (!isset($data['id'])) {
+        if (!isset($data['gorestId'])) {
             return $this->json([
                 'success' => false,
                 'message' => 'Invalid data',
             ], 422);
         }
 
-        $user = $this->repository->find((int)$data['id']);
-        if (!$user) {
+        $apiUser = $this->api->find((int)$data['gorestId']);
+        if (!$apiUser) {
             return $this->json([
                 'success' => false,
                 'message' => 'User does not exist',
             ], 404);
         }
+
+        $user = new GorestUser();
+        $user->setGorestId($apiUser['id']);
+        $user->setName($apiUser['name']);
+        $user->setEmail($apiUser['email']);
+        $user->setGender($apiUser['gender']);
+        $user->setStatus($apiUser['status']);
 
         $form = $this->createForm(GorestUserType::class, $user);
 
@@ -266,20 +210,27 @@ class GorestLocalController extends AbstractController
     {
         $data = (array)json_decode($request->getContent(), true);
 
-        if (!isset($data['id'])) {
+        if (!isset($data['gorestId'])) {
             return $this->json([
                 'success' => false,
                 'message' => 'Invalid data',
             ], 422);
         }
 
-        $user = $this->repository->find((int)$data['id']);
-        if (!$user) {
+        $apiUser = $this->api->find((int)$data['gorestId']);
+        if (!$apiUser) {
             return $this->json([
                 'success' => false,
                 'message' => 'User does not exist',
             ], 404);
         }
+
+        $user = new GorestUser();
+        $user->setGorestId($apiUser['id']);
+        $user->setName($apiUser['name']);
+        $user->setEmail($apiUser['email']);
+        $user->setGender($apiUser['gender']);
+        $user->setStatus($apiUser['status']);
 
         $form = $this->createForm(GorestUserType::class, $user);
 
@@ -291,5 +242,24 @@ class GorestLocalController extends AbstractController
             'success' => true,
             'form' => $html
         ]);
+    }
+
+    #[Route('/gorest/sync', name: 'gorest.sync')]
+    public function syncLocalWithApi(): JsonResponse
+    {
+        $users = $this->api->index(self::PAGE_SIZE);
+        if (!$users) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Synchronisation unsuccessful',
+            ], 404);
+        }
+
+        $this->repository->syncLocalToArray($users);
+
+        return $this->json([
+            'success' => true,
+            'message' => 'Synchronisation successful',
+        ], 201);
     }
 }

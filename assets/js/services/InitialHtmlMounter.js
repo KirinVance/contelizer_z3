@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import { GorestBackend } from './GorestBackend';
-import { GorestResponseHandler } from './GorestResponseHandler';
 import { HtmlHandler } from './HtmlHandler';
 
 export class InitialHtmlMounter {

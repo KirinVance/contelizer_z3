@@ -48,4 +48,22 @@ class GorestUserRepository extends ServiceEntityRepository
                   ->getQuery()
                   ->getResult();
     }
+
+    public function syncLocalToArray(array $users): void
+    {
+        $em = $this->getEntityManager();
+        $em->createQuery('DELETE FROM App\Entity\GorestUser u')->execute();
+
+        foreach($users as $userData) {
+            $user = new GorestUser();
+            $user->setGorestId($userData['id']);
+            $user->setName($userData['name']);
+            $user->setEmail($userData['email']);
+            $user->setGender($userData['gender']);
+            $user->setStatus($userData['status']);
+
+            $em->persist($user);
+        }
+        $em->flush();
+    }
 }
